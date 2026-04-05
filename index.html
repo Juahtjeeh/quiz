@@ -645,13 +645,13 @@ async function endGame() {
     });
     if (!res.ok) {
       const err = await res.json();
-      throw new Error(err.error || 'Opslaan mislukt');
+      throw new Error((err.error || 'Opslaan mislukt') + (err.detail ? ': ' + err.detail : ''));
     }
     document.getElementById('score-saving').textContent = 'Score opgeslagen!';
   } catch (e) {
     document.getElementById('score-saving').textContent = '';
     const errEl = document.getElementById('error-msg');
-    errEl.textContent = 'Score kon niet worden opgeslagen: ' + e.message;
+    errEl.textContent = 'Score kon niet worden opgeslagen: ' + e.message + ' — ' + (e.detail || '');
     errEl.style.display = 'block';
   }
 
