@@ -30,7 +30,8 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Ongeldige nickname' });
     if (!['easy','medium','hard'].includes(difficulty))
       return res.status(400).json({ error: 'Ongeldige moeilijkheidsgraad' });
-    if (typeof score !== 'number' || score < 0 || score > 9999)
+    const maxScores = { easy: 2000, medium: 3000, hard: 4000 };
+    if (typeof score !== 'number' || score < 0 || score > maxScores[difficulty])
       return res.status(400).json({ error: 'Ongeldige score' });
 
     const { data: allowed } = await supabase
