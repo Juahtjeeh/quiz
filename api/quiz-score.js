@@ -41,7 +41,7 @@ export default async function handler(req, res) {
     const { error } = await supabase.from('quiz_scores').insert({
       nickname, score, difficulty, correct, total, ip_hash: ipHash
     });
-    if (error) return res.status(500).json({ error: 'Opslaan mislukt' });
+    if (error) return res.status(500).json({ error: 'Opslaan mislukt', detail: error.message });
     return res.status(200).json({ success: true });
   }
 
@@ -53,7 +53,7 @@ export default async function handler(req, res) {
       .eq('difficulty', difficulty)
       .order('score', { ascending: false })
       .limit(10);
-    if (error) return res.status(500).json({ error: 'Ophalen mislukt' });
+    if (error) return res.status(500).json({ error: 'Ophalen mislukt', detail: error.message });
     return res.status(200).json(data);
   }
 }
