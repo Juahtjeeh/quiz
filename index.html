@@ -16,8 +16,6 @@
     --teal-mid: #1D9E75;
     --coral: #C1440E;
     --coral-light: #FBE9E3;
-    --gold: #B5862A;
-    --gold-light: #FDF3DC;
     --white: #FFFFFF;
     --radius: 12px;
     --radius-sm: 8px;
@@ -51,16 +49,43 @@
     color: var(--ink-light);
     letter-spacing: 0.02em;
   }
-
   .logo span { color: var(--teal); }
+
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .lang-toggle {
+    display: flex;
+    background: var(--sand-dark);
+    border-radius: 20px;
+    padding: 2px;
+    gap: 2px;
+  }
+
+  .lang-btn {
+    padding: 4px 10px;
+    border-radius: 16px;
+    border: none;
+    background: transparent;
+    font-size: 12px;
+    font-weight: 500;
+    font-family: 'DM Sans', sans-serif;
+    color: var(--ink-light);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .lang-btn.active {
+    background: var(--white);
+    color: var(--teal);
+  }
 
   .back-link {
     font-size: 13px;
     color: var(--ink-light);
     text-decoration: none;
-    display: flex;
-    align-items: center;
-    gap: 4px;
     transition: color 0.15s;
   }
   .back-link:hover { color: var(--teal); }
@@ -77,7 +102,6 @@
   .screen { display: none; }
   .screen.active { display: block; }
 
-  /* Nick screen */
   .hero-label {
     font-size: 11px;
     font-weight: 500;
@@ -185,7 +209,6 @@
     line-height: 1.5;
   }
 
-  /* Quiz screen */
   .progress-wrap {
     height: 3px;
     background: var(--sand);
@@ -267,12 +290,10 @@
     border-radius: var(--radius-sm);
     font-size: 13px;
     line-height: 1.5;
-    transition: all 0.2s;
   }
   .feedback-box.correct { background: var(--teal-light); color: var(--teal); }
   .feedback-box.wrong { background: var(--coral-light); color: var(--coral); }
 
-  /* Result screen */
   .result-heading {
     font-family: 'Playfair Display', serif;
     font-size: 28px;
@@ -345,7 +366,6 @@
   .lb-rank { width: 20px; color: var(--ink-light); font-size: 12px; }
   .lb-name { flex: 1; color: var(--ink); }
   .lb-score { font-weight: 500; color: var(--ink); }
-  .lb-medal { font-size: 14px; }
 
   .lb-loading {
     padding: 20px 16px;
@@ -396,7 +416,6 @@
     h1 { font-size: 26px; }
     .question-text { font-size: 19px; }
     .answers-grid { grid-template-columns: 1fr; }
-    .stats-grid { grid-template-columns: 1fr 1fr; }
   }
 </style>
 </head>
@@ -404,76 +423,72 @@
 
 <header>
   <div class="logo">juanita<span>explores</span>.com</div>
-  <a class="back-link" href="https://juanitaexplores.com">← terug naar blog</a>
+  <div class="header-right">
+    <div class="lang-toggle">
+      <button class="lang-btn active" id="btn-nl" onclick="setLang('nl')">NL</button>
+      <button class="lang-btn" id="btn-en" onclick="setLang('en')">EN</button>
+    </div>
+    <a class="back-link" id="back-link" href="https://juanitaexplores.com">← blog</a>
+  </div>
 </header>
 
 <div class="card">
 
-  <!-- SCHERM 1: NICKNAME -->
   <div id="screen-nick" class="screen active">
-    <div class="hero-label">Trivia challenge</div>
-    <h1>World Explorer Quiz</h1>
-    <p class="subtitle">Test je kennis over landen, hoofdsteden en geografie. Hoe snel ben jij?</p>
-
-    <label for="nick-input">Jouw nickname</label>
-    <input type="text" id="nick-input" placeholder="bijv. WanderingJuanita" maxlength="20" autocomplete="off" />
-
-    <div class="diff-label">Moeilijkheidsgraad</div>
+    <div class="hero-label" id="label-trivia">Trivia challenge</div>
+    <h1 id="title-main">World Explorer Quiz</h1>
+    <p class="subtitle" id="subtitle-main"></p>
+    <label for="nick-input" id="label-nick"></label>
+    <input type="text" id="nick-input" maxlength="20" autocomplete="off" />
+    <div class="diff-label" id="label-diff"></div>
     <div class="diff-grid">
       <button class="diff-btn" data-diff="easy">
-        <div class="diff-name">Makkelijk</div>
-        <div class="diff-meta">10 vr · 20 sec</div>
+        <div class="diff-name" id="diff-easy"></div>
+        <div class="diff-meta">10 · 20s</div>
       </button>
       <button class="diff-btn selected" data-diff="medium">
-        <div class="diff-name">Medium</div>
-        <div class="diff-meta">15 vr · 15 sec</div>
+        <div class="diff-name" id="diff-medium"></div>
+        <div class="diff-meta">15 · 15s</div>
       </button>
       <button class="diff-btn" data-diff="hard">
-        <div class="diff-name">Moeilijk</div>
-        <div class="diff-meta">20 vr · 10 sec</div>
+        <div class="diff-name" id="diff-hard"></div>
+        <div class="diff-meta">20 · 10s</div>
       </button>
     </div>
-
-    <button class="btn-primary" id="start-btn" disabled>Begin de quiz</button>
-    <p class="privacy-note">Je nickname verschijnt op het gedeelde leaderboard. Er worden geen andere gegevens opgeslagen.</p>
+    <button class="btn-primary" id="start-btn" disabled></button>
+    <p class="privacy-note" id="privacy-note"></p>
   </div>
 
-  <!-- SCHERM 2: QUIZ -->
   <div id="screen-quiz" class="screen">
     <div class="progress-wrap"><div class="progress-fill" id="progress-fill"></div></div>
     <div class="quiz-meta">
-      <span class="q-count" id="q-count">Vraag 1 / 15</span>
-      <span class="timer-pill" id="timer">15s</span>
+      <span class="q-count" id="q-count"></span>
+      <span class="timer-pill" id="timer"></span>
     </div>
     <div class="question-text" id="question-text"></div>
     <div class="answers-grid" id="answers-grid"></div>
     <div class="feedback-box" id="feedback-box"></div>
   </div>
 
-  <!-- SCHERM 3: RESULTAAT -->
   <div id="screen-result" class="screen">
-    <div class="hero-label">Klaar!</div>
-    <div class="result-heading" id="result-heading">Goed gespeeld</div>
-    <div class="result-sub" id="result-sub">Jouw score is opgeslagen.</div>
-
+    <div class="hero-label" id="label-done"></div>
+    <div class="result-heading" id="result-heading"></div>
+    <div class="result-sub" id="result-sub"></div>
     <div class="stats-grid">
-      <div class="stat-card"><div class="stat-label">Score</div><div class="stat-value" id="res-score">0</div></div>
-      <div class="stat-card"><div class="stat-label">Goed</div><div class="stat-value" id="res-correct">0/0</div></div>
-      <div class="stat-card"><div class="stat-label">Beste streak</div><div class="stat-value" id="res-streak">0</div></div>
-      <div class="stat-card"><div class="stat-label">Gem. tijd</div><div class="stat-value" id="res-time">0s</div></div>
+      <div class="stat-card"><div class="stat-label" id="label-score"></div><div class="stat-value" id="res-score">0</div></div>
+      <div class="stat-card"><div class="stat-label" id="label-correct"></div><div class="stat-value" id="res-correct">0/0</div></div>
+      <div class="stat-card"><div class="stat-label" id="label-streak"></div><div class="stat-value" id="res-streak">0</div></div>
+      <div class="stat-card"><div class="stat-label" id="label-time"></div><div class="stat-value" id="res-time">0s</div></div>
     </div>
-
     <div class="lb-section">
-      <div class="lb-header">Leaderboard — <span id="lb-diff-label">medium</span></div>
-      <div id="lb-body"><div class="lb-loading">Scores laden...</div></div>
+      <div class="lb-header">Leaderboard — <span id="lb-diff-label"></span></div>
+      <div id="lb-body"></div>
     </div>
-
     <div class="score-saving" id="score-saving"></div>
     <div class="error-msg" id="error-msg"></div>
-
     <div class="action-row">
-      <button class="btn-secondary" onclick="goToNick()">Terug</button>
-      <button class="btn-primary" onclick="restart()">Opnieuw</button>
+      <button class="btn-secondary" id="btn-back" onclick="goToNick()"></button>
+      <button class="btn-primary" id="btn-again" onclick="restart()"></button>
     </div>
   </div>
 
@@ -482,66 +497,193 @@
 <script>
 const API_BASE = 'https://quiz-eight-khaki-53.vercel.app/api/quiz-score';
 
-const QUESTIONS = [
-  {q:"Wat is de hoofdstad van Japan?",a:["Tokyo","Osaka","Kyoto","Hiroshima"],c:0,hint:"De grootste metropool ter wereld."},
-  {q:"In welk land ligt Machu Picchu?",a:["Colombia","Bolivia","Peru","Ecuador"],c:2,hint:"In de Andes, op 2.430 meter hoogte."},
-  {q:"Welke rivier stroomt door Egypte?",a:["Congo","Niger","Zambezi","Nijl"],c:3,hint:"De langste rivier ter wereld."},
-  {q:"Hoeveel landen telt het Afrikaanse continent?",a:["44","54","62","48"],c:1,hint:"Meer dan je denkt!"},
-  {q:"Wat is de kleinste staat ter wereld?",a:["Monaco","Liechtenstein","Vaticaanstad","San Marino"],c:2,hint:"Ligt volledig binnen Rome."},
-  {q:"Welk land heeft de meeste tijdzones?",a:["Rusland","USA","China","Canada"],c:0,hint:"Strekt zich uit over 11 zones."},
-  {q:"In welk land ligt de meeste Sahara?",a:["Libië","Sudan","Algerije","Mauritanië"],c:2,hint:"Het grootste land van Afrika."},
-  {q:"Wat is de hoogste berg van Afrika?",a:["Mount Kenya","Kilimanjaro","Rwenzori","Atlas"],c:1,hint:"Staat in Tanzania."},
-  {q:"Welk land heeft de langste kustlijn?",a:["Noorwegen","Rusland","Canada","Australië"],c:2,hint:"Noord-Amerika's grote buurland."},
-  {q:"Wat is de hoofdstad van Australië?",a:["Sydney","Melbourne","Brisbane","Canberra"],c:3,hint:"Niet de grootste stad van het land."},
-  {q:"Welk land heeft de meeste inwoners?",a:["India","China","USA","Indonesië"],c:0,hint:"Heeft China recent ingehaald."},
-  {q:"Hoeveel landen grenzen aan Zwitserland?",a:["4","5","6","7"],c:1,hint:"Denk aan alle windrichtingen."},
-  {q:"Welk land ligt volledig in de Pyreneeën?",a:["Monaco","Andorra","San Marino","Liechtenstein"],c:1,hint:"Tussen Spanje en Frankrijk."},
-  {q:"Welke oceaan is het diepst?",a:["Atlantische","Indische","Arctische","Stille"],c:3,hint:"De Marianentrog ligt hier."},
-  {q:"In welk land ligt Petra?",a:["Egypte","Irak","Jordanië","Syrië"],c:2,hint:"Een roze rotsstad in het Midden-Oosten."},
-  {q:"Welk eiland is het grootste ter wereld?",a:["Borneo","Madagaskar","Groenland","Nieuw-Guinea"],c:2,hint:"Autonoom Deens gebied."},
-  {q:"In welk land staat de Eiffeltoren?",a:["België","Zwitserland","Frankrijk","Luxemburg"],c:2,hint:"Een makkelijke bonus!"},
-  {q:"Wat is de langste rivier van Zuid-Amerika?",a:["Orinoco","Rio de la Plata","Amazonas","Paraná"],c:2,hint:"Geeft naam aan het regenwoud."},
-  {q:"Welk land hoort NIET bij Scandinavië?",a:["Noorwegen","Finland","Denemarken","IJsland"],c:3,hint:"Ligt iets westelijker in de Atlantische Oceaan."},
-  {q:"Welke stad is de hoofdstad van Canada?",a:["Toronto","Vancouver","Montreal","Ottawa"],c:3,hint:"Niet de grootste stad."},
-  {q:"In welk land ligt de Angkor Wat?",a:["Thailand","Vietnam","Cambodja","Myanmar"],c:2,hint:"Een van de grootste religieuze complexen ter wereld."},
-  {q:"Welke zee ligt tussen Europa en Afrika?",a:["Rode Zee","Kaspische Zee","Middellandse Zee","Zwarte Zee"],c:2,hint:"Populaire vakantiebestemming."},
-  {q:"Hoeveel sterren heeft de vlag van de EU?",a:["12","15","24","27"],c:0,hint:"Altijd hetzelfde aantal, ongeacht het aantal lidstaten."},
-  {q:"Welk land heeft de grootste oppervlakte?",a:["Canada","China","USA","Rusland"],c:3,hint:"Strekt zich uit over twee continenten."},
-  {q:"Wat is de hoofdstad van Brazilië?",a:["São Paulo","Rio de Janeiro","Brasília","Salvador"],c:2,hint:"Speciaal gebouwd als hoofdstad in 1960."},
-  {q:"In welk land ligt de Taj Mahal?",a:["Pakistan","Bangladesh","Nepal","India"],c:3,hint:"In de stad Agra."},
-  {q:"Welk land heeft de meeste meren ter wereld?",a:["Rusland","Finland","Canada","Zweden"],c:2,hint:"Meer dan de helft van alle meren ter wereld."},
-  {q:"Wat is de hoofdstad van Marokko?",a:["Casablanca","Marrakech","Rabat","Fez"],c:2,hint:"Niet de grootste stad van het land."},
-  {q:"In welk land ligt Mount Everest?",a:["India","Tibet","Nepal","Bhutan"],c:2,hint:"Op de grens met een buurland."},
-  {q:"Welke stad wordt ook wel de eeuwige stad genoemd?",a:["Athene","Cairo","Istanbul","Rome"],c:3,hint:"Hoofdstad van Italië."},
-  {q:"Welk land heeft de meeste UNESCO werelderfgoederen?",a:["China","Italië","Spanje","Frankrijk"],c:1,hint:"Een Europees land bekend om kunst en geschiedenis."},
-  {q:"In welk land ligt de Serengeti?",a:["Kenia","Tanzania","Uganda","Ethiopië"],c:1,hint:"Bekend om de grote migratie van gnoes."},
-  {q:"Wat is de hoofdstad van Argentinië?",a:["Montevideo","Santiago","Lima","Buenos Aires"],c:3,hint:"Betekent letterlijk goede luchten."},
-  {q:"Welke berg is de hoogste van Europa?",a:["Mont Blanc","Matterhorn","Elbrus","Monte Rosa"],c:2,hint:"Ligt op de grens van Rusland en Georgië."},
-  {q:"In welk land ligt Bali?",a:["Maleisië","Filipijnen","Thailand","Indonesië"],c:3,hint:"Het grootste eilandenrijk ter wereld."},
-  {q:"Wat is de hoofdstad van Egypte?",a:["Alexandrië","Luxor","Caïro","Aswan"],c:2,hint:"Een van de grootste steden van Afrika."},
-  {q:"Welk land grenst NIET aan Frankrijk?",a:["Luxemburg","Oostenrijk","Zwitserland","België"],c:1,hint:"Denk aan welke landen echt aan Frankrijk grenzen."},
-  {q:"In welk land ligt de Gobi woestijn?",a:["Kazachstan","Iran","Mongolië","Oezbekistan"],c:2,hint:"De grootste woestijn van Azië."},
-  {q:"Wat is de langste muur ter wereld?",a:["Muur van Berlijn","Grote Muur van China","Hadrianuswal","Muur van Babylon"],c:1,hint:"Meer dan 21.000 kilometer lang."},
-  {q:"In welk land ligt Dubrovnik?",a:["Slovenië","Montenegro","Bosnië","Kroatië"],c:3,hint:"Bekend als locatie van Game of Thrones."},
-  {q:"Welke hoofdstad ligt het hoogst boven zeeniveau?",a:["Quito","Bogotá","La Paz","Addis Abeba"],c:2,hint:"Ligt op meer dan 3.600 meter hoogte."},
-  {q:"In welk land ligt de Cappadocië regio?",a:["Griekenland","Armenië","Turkije","Syrië"],c:2,hint:"Bekend om heteluchtballonvaarten."},
-  {q:"Wat is de hoofdstad van Vietnam?",a:["Ho Chi Minhstad","Da Nang","Hue","Hanoi"],c:3,hint:"In het noorden van het land."},
-  {q:"Welk land heeft de langste treinroute ter wereld?",a:["China","Rusland","Canada","USA"],c:1,hint:"De Transsiberische spoorlijn."},
-  {q:"In welk land ligt de Alhambra?",a:["Portugal","Marokko","Spanje","Italië"],c:2,hint:"In de stad Granada."},
-  {q:"Wat is de hoofdstad van Nieuw-Zeeland?",a:["Auckland","Christchurch","Dunedin","Wellington"],c:3,hint:"Niet de grootste stad van het land."},
-  {q:"Welk land heeft de meeste actieve vulkanen?",a:["Japan","IJsland","Indonesië","Mexico"],c:2,hint:"Ligt op de Pacifische Ring van Vuur."},
-  {q:"In welk land ligt het Victoriameer?",a:["Alleen in Kenia","Alleen in Tanzania","Uganda, Kenia en Tanzania","Alleen in Uganda"],c:2,hint:"Het grootste meer van Afrika, gedeeld door drie landen."},
-  {q:"Wat is de hoofdstad van IJsland?",a:["Akureyri","Reykjavik","Hafnarfjörður","Keflavik"],c:1,hint:"De meest noordelijke hoofdstad ter wereld."},
-];
+const QUESTIONS = {
+  nl: [
+    {q:"Wat is de hoofdstad van Japan?",a:["Tokyo","Osaka","Kyoto","Hiroshima"],c:0,hint:"De grootste metropool ter wereld."},
+    {q:"In welk land ligt Machu Picchu?",a:["Colombia","Bolivia","Peru","Ecuador"],c:2,hint:"In de Andes, op 2.430 meter hoogte."},
+    {q:"Welke rivier stroomt door Egypte?",a:["Congo","Niger","Zambezi","Nijl"],c:3,hint:"De langste rivier ter wereld."},
+    {q:"Hoeveel landen telt het Afrikaanse continent?",a:["44","54","62","48"],c:1,hint:"Meer dan je denkt!"},
+    {q:"Wat is de kleinste staat ter wereld?",a:["Monaco","Liechtenstein","Vaticaanstad","San Marino"],c:2,hint:"Ligt volledig binnen Rome."},
+    {q:"Welk land heeft de meeste tijdzones?",a:["Rusland","USA","China","Canada"],c:0,hint:"Strekt zich uit over 11 zones."},
+    {q:"In welk land ligt de meeste Sahara?",a:["Libië","Sudan","Algerije","Mauritanië"],c:2,hint:"Het grootste land van Afrika."},
+    {q:"Wat is de hoogste berg van Afrika?",a:["Mount Kenya","Kilimanjaro","Rwenzori","Atlas"],c:1,hint:"Staat in Tanzania."},
+    {q:"Welk land heeft de langste kustlijn?",a:["Noorwegen","Rusland","Canada","Australië"],c:2,hint:"Noord-Amerika's grote buurland."},
+    {q:"Wat is de hoofdstad van Australië?",a:["Sydney","Melbourne","Brisbane","Canberra"],c:3,hint:"Niet de grootste stad van het land."},
+    {q:"Welk land heeft de meeste inwoners?",a:["India","China","USA","Indonesië"],c:0,hint:"Heeft China recent ingehaald."},
+    {q:"Hoeveel landen grenzen aan Zwitserland?",a:["4","5","6","7"],c:1,hint:"Denk aan alle windrichtingen."},
+    {q:"Welk land ligt volledig in de Pyreneeën?",a:["Monaco","Andorra","San Marino","Liechtenstein"],c:1,hint:"Tussen Spanje en Frankrijk."},
+    {q:"Welke oceaan is het diepst?",a:["Atlantische","Indische","Arctische","Stille"],c:3,hint:"De Marianentrog ligt hier."},
+    {q:"In welk land ligt Petra?",a:["Egypte","Irak","Jordanië","Syrië"],c:2,hint:"Een roze rotsstad in het Midden-Oosten."},
+    {q:"Welk eiland is het grootste ter wereld?",a:["Borneo","Madagaskar","Groenland","Nieuw-Guinea"],c:2,hint:"Autonoom Deens gebied."},
+    {q:"In welk land staat de Eiffeltoren?",a:["België","Zwitserland","Frankrijk","Luxemburg"],c:2,hint:"Een makkelijke bonus!"},
+    {q:"Wat is de langste rivier van Zuid-Amerika?",a:["Orinoco","Rio de la Plata","Amazonas","Paraná"],c:2,hint:"Geeft naam aan het regenwoud."},
+    {q:"Welk land hoort NIET bij Scandinavië?",a:["Noorwegen","Finland","Denemarken","IJsland"],c:3,hint:"Ligt iets westelijker in de Atlantische Oceaan."},
+    {q:"Welke stad is de hoofdstad van Canada?",a:["Toronto","Vancouver","Montreal","Ottawa"],c:3,hint:"Niet de grootste stad."},
+    {q:"In welk land ligt de Angkor Wat?",a:["Thailand","Vietnam","Cambodja","Myanmar"],c:2,hint:"Een van de grootste religieuze complexen ter wereld."},
+    {q:"Welke zee ligt tussen Europa en Afrika?",a:["Rode Zee","Kaspische Zee","Middellandse Zee","Zwarte Zee"],c:2,hint:"Populaire vakantiebestemming."},
+    {q:"Hoeveel sterren heeft de vlag van de EU?",a:["12","15","24","27"],c:0,hint:"Altijd hetzelfde aantal, ongeacht het aantal lidstaten."},
+    {q:"Welk land heeft de grootste oppervlakte?",a:["Canada","China","USA","Rusland"],c:3,hint:"Strekt zich uit over twee continenten."},
+    {q:"Wat is de hoofdstad van Brazilië?",a:["São Paulo","Rio de Janeiro","Brasília","Salvador"],c:2,hint:"Speciaal gebouwd als hoofdstad in 1960."},
+    {q:"In welk land ligt de Taj Mahal?",a:["Pakistan","Bangladesh","Nepal","India"],c:3,hint:"In de stad Agra."},
+    {q:"Welk land heeft de meeste meren ter wereld?",a:["Rusland","Finland","Canada","Zweden"],c:2,hint:"Meer dan de helft van alle meren ter wereld."},
+    {q:"Wat is de hoofdstad van Marokko?",a:["Casablanca","Marrakech","Rabat","Fez"],c:2,hint:"Niet de grootste stad van het land."},
+    {q:"In welk land ligt Mount Everest?",a:["India","Tibet","Nepal","Bhutan"],c:2,hint:"Op de grens met een buurland."},
+    {q:"Welke stad wordt ook wel de eeuwige stad genoemd?",a:["Athene","Cairo","Istanbul","Rome"],c:3,hint:"Hoofdstad van Italië."},
+    {q:"Welk land heeft de meeste UNESCO werelderfgoederen?",a:["China","Italië","Spanje","Frankrijk"],c:1,hint:"Een Europees land bekend om kunst en geschiedenis."},
+    {q:"In welk land ligt de Serengeti?",a:["Kenia","Tanzania","Uganda","Ethiopië"],c:1,hint:"Bekend om de grote migratie van gnoes."},
+    {q:"Wat is de hoofdstad van Argentinië?",a:["Montevideo","Santiago","Lima","Buenos Aires"],c:3,hint:"Betekent letterlijk goede luchten."},
+    {q:"Welke berg is de hoogste van Europa?",a:["Mont Blanc","Matterhorn","Elbrus","Monte Rosa"],c:2,hint:"Ligt op de grens van Rusland en Georgië."},
+    {q:"In welk land ligt Bali?",a:["Maleisië","Filipijnen","Thailand","Indonesië"],c:3,hint:"Het grootste eilandenrijk ter wereld."},
+    {q:"Wat is de hoofdstad van Egypte?",a:["Alexandrië","Luxor","Caïro","Aswan"],c:2,hint:"Een van de grootste steden van Afrika."},
+    {q:"Welk land grenst NIET aan Frankrijk?",a:["Luxemburg","Oostenrijk","Zwitserland","België"],c:1,hint:"Denk aan welke landen echt aan Frankrijk grenzen."},
+    {q:"In welk land ligt de Gobi woestijn?",a:["Kazachstan","Iran","Mongolië","Oezbekistan"],c:2,hint:"De grootste woestijn van Azië."},
+    {q:"Wat is de langste muur ter wereld?",a:["Muur van Berlijn","Grote Muur van China","Hadrianuswal","Muur van Babylon"],c:1,hint:"Meer dan 21.000 kilometer lang."},
+    {q:"In welk land ligt Dubrovnik?",a:["Slovenië","Montenegro","Bosnië","Kroatië"],c:3,hint:"Bekend als locatie van Game of Thrones."},
+    {q:"Welke hoofdstad ligt het hoogst boven zeeniveau?",a:["Quito","Bogotá","La Paz","Addis Abeba"],c:2,hint:"Ligt op meer dan 3.600 meter hoogte."},
+    {q:"In welk land ligt de Cappadocië regio?",a:["Griekenland","Armenië","Turkije","Syrië"],c:2,hint:"Bekend om heteluchtballonvaarten."},
+    {q:"Wat is de hoofdstad van Vietnam?",a:["Ho Chi Minhstad","Da Nang","Hue","Hanoi"],c:3,hint:"In het noorden van het land."},
+    {q:"Welk land heeft de langste treinroute ter wereld?",a:["China","Rusland","Canada","USA"],c:1,hint:"De Transsiberische spoorlijn."},
+    {q:"In welk land ligt de Alhambra?",a:["Portugal","Marokko","Spanje","Italië"],c:2,hint:"In de stad Granada."},
+    {q:"Wat is de hoofdstad van Nieuw-Zeeland?",a:["Auckland","Christchurch","Dunedin","Wellington"],c:3,hint:"Niet de grootste stad van het land."},
+    {q:"Welk land heeft de meeste actieve vulkanen?",a:["Japan","IJsland","Indonesië","Mexico"],c:2,hint:"Ligt op de Pacifische Ring van Vuur."},
+    {q:"In welk land ligt het Victoriameer?",a:["Alleen in Kenia","Alleen in Tanzania","Uganda, Kenia en Tanzania","Alleen in Uganda"],c:2,hint:"Het grootste meer van Afrika, gedeeld door drie landen."},
+    {q:"Wat is de hoofdstad van IJsland?",a:["Akureyri","Reykjavik","Hafnarfjörður","Keflavik"],c:1,hint:"De meest noordelijke hoofdstad ter wereld."},
+  ],
+  en: [
+    {q:"What is the capital of Japan?",a:["Tokyo","Osaka","Kyoto","Hiroshima"],c:0,hint:"The largest metropolis in the world."},
+    {q:"In which country is Machu Picchu located?",a:["Colombia","Bolivia","Peru","Ecuador"],c:2,hint:"In the Andes, at 2,430 meters altitude."},
+    {q:"Which river flows through Egypt?",a:["Congo","Niger","Zambezi","Nile"],c:3,hint:"The longest river in the world."},
+    {q:"How many countries does the African continent have?",a:["44","54","62","48"],c:1,hint:"More than you might think!"},
+    {q:"What is the smallest country in the world?",a:["Monaco","Liechtenstein","Vatican City","San Marino"],c:2,hint:"Located entirely within Rome."},
+    {q:"Which country has the most time zones?",a:["Russia","USA","China","Canada"],c:0,hint:"Spans across 11 time zones."},
+    {q:"Which country contains most of the Sahara?",a:["Libya","Sudan","Algeria","Mauritania"],c:2,hint:"The largest country in Africa."},
+    {q:"What is the highest mountain in Africa?",a:["Mount Kenya","Kilimanjaro","Rwenzori","Atlas"],c:1,hint:"Located in Tanzania."},
+    {q:"Which country has the longest coastline?",a:["Norway","Russia","Canada","Australia"],c:2,hint:"North America's large northern neighbor."},
+    {q:"What is the capital of Australia?",a:["Sydney","Melbourne","Brisbane","Canberra"],c:3,hint:"Not the largest city in the country."},
+    {q:"Which country has the most inhabitants?",a:["India","China","USA","Indonesia"],c:0,hint:"Recently surpassed China."},
+    {q:"How many countries border Switzerland?",a:["4","5","6","7"],c:1,hint:"Think of all directions."},
+    {q:"Which country lies entirely in the Pyrenees?",a:["Monaco","Andorra","San Marino","Liechtenstein"],c:1,hint:"Between Spain and France."},
+    {q:"Which ocean is the deepest?",a:["Atlantic","Indian","Arctic","Pacific"],c:3,hint:"The Mariana Trench is located here."},
+    {q:"In which country is Petra located?",a:["Egypt","Iraq","Jordan","Syria"],c:2,hint:"A rose-red rock city in the Middle East."},
+    {q:"Which is the largest island in the world?",a:["Borneo","Madagascar","Greenland","New Guinea"],c:2,hint:"An autonomous Danish territory."},
+    {q:"In which country is the Eiffel Tower?",a:["Belgium","Switzerland","France","Luxembourg"],c:2,hint:"An easy bonus question!"},
+    {q:"What is the longest river in South America?",a:["Orinoco","Rio de la Plata","Amazon","Paraná"],c:2,hint:"Gives its name to the rainforest."},
+    {q:"Which country does NOT belong to Scandinavia?",a:["Norway","Finland","Denmark","Iceland"],c:3,hint:"Located further west in the Atlantic Ocean."},
+    {q:"What is the capital of Canada?",a:["Toronto","Vancouver","Montreal","Ottawa"],c:3,hint:"Not the largest city."},
+    {q:"In which country is Angkor Wat located?",a:["Thailand","Vietnam","Cambodia","Myanmar"],c:2,hint:"One of the largest religious complexes in the world."},
+    {q:"Which sea lies between Europe and Africa?",a:["Red Sea","Caspian Sea","Mediterranean Sea","Black Sea"],c:2,hint:"A popular holiday destination."},
+    {q:"How many stars does the EU flag have?",a:["12","15","24","27"],c:0,hint:"Always the same number, regardless of member states."},
+    {q:"Which country has the largest surface area?",a:["Canada","China","USA","Russia"],c:3,hint:"Spans across two continents."},
+    {q:"What is the capital of Brazil?",a:["São Paulo","Rio de Janeiro","Brasília","Salvador"],c:2,hint:"Specially built as a capital in 1960."},
+    {q:"In which country is the Taj Mahal located?",a:["Pakistan","Bangladesh","Nepal","India"],c:3,hint:"In the city of Agra."},
+    {q:"Which country has the most lakes in the world?",a:["Russia","Finland","Canada","Sweden"],c:2,hint:"Home to more than half of all lakes in the world."},
+    {q:"What is the capital of Morocco?",a:["Casablanca","Marrakech","Rabat","Fez"],c:2,hint:"Not the largest city in the country."},
+    {q:"In which country is Mount Everest located?",a:["India","Tibet","Nepal","Bhutan"],c:2,hint:"On the border with a neighboring country."},
+    {q:"Which city is also known as the eternal city?",a:["Athens","Cairo","Istanbul","Rome"],c:3,hint:"Capital of Italy."},
+    {q:"Which country has the most UNESCO World Heritage Sites?",a:["China","Italy","Spain","France"],c:1,hint:"A European country known for art and history."},
+    {q:"In which country is the Serengeti located?",a:["Kenya","Tanzania","Uganda","Ethiopia"],c:1,hint:"Famous for the great wildebeest migration."},
+    {q:"What is the capital of Argentina?",a:["Montevideo","Santiago","Lima","Buenos Aires"],c:3,hint:"Literally means good winds."},
+    {q:"Which mountain is the highest in Europe?",a:["Mont Blanc","Matterhorn","Elbrus","Monte Rosa"],c:2,hint:"Located on the border of Russia and Georgia."},
+    {q:"In which country is Bali located?",a:["Malaysia","Philippines","Thailand","Indonesia"],c:3,hint:"The largest archipelago in the world."},
+    {q:"What is the capital of Egypt?",a:["Alexandria","Luxor","Cairo","Aswan"],c:2,hint:"One of the largest cities in Africa."},
+    {q:"Which country does NOT border France?",a:["Luxembourg","Austria","Switzerland","Belgium"],c:1,hint:"Think about which countries actually border France."},
+    {q:"In which country is the Gobi Desert located?",a:["Kazakhstan","Iran","Mongolia","Uzbekistan"],c:2,hint:"The largest desert in Asia."},
+    {q:"What is the longest wall in the world?",a:["Berlin Wall","Great Wall of China","Hadrian's Wall","Wall of Babylon"],c:1,hint:"More than 21,000 kilometers long."},
+    {q:"In which country is Dubrovnik located?",a:["Slovenia","Montenegro","Bosnia","Croatia"],c:3,hint:"Famous as a Game of Thrones filming location."},
+    {q:"Which capital city is highest above sea level?",a:["Quito","Bogotá","La Paz","Addis Ababa"],c:2,hint:"Located at more than 3,600 meters altitude."},
+    {q:"In which country is the Cappadocia region?",a:["Greece","Armenia","Turkey","Syria"],c:2,hint:"Famous for hot air balloon rides."},
+    {q:"What is the capital of Vietnam?",a:["Ho Chi Minh City","Da Nang","Hue","Hanoi"],c:3,hint:"In the north of the country."},
+    {q:"Which country has the longest train route in the world?",a:["China","Russia","Canada","USA"],c:1,hint:"The Trans-Siberian Railway."},
+    {q:"In which country is the Alhambra located?",a:["Portugal","Morocco","Spain","Italy"],c:2,hint:"In the city of Granada."},
+    {q:"What is the capital of New Zealand?",a:["Auckland","Christchurch","Dunedin","Wellington"],c:3,hint:"Not the largest city in the country."},
+    {q:"Which country has the most active volcanoes?",a:["Japan","Iceland","Indonesia","Mexico"],c:2,hint:"Located on the Pacific Ring of Fire."},
+    {q:"In which countries is Lake Victoria located?",a:["Kenya only","Tanzania only","Uganda, Kenya and Tanzania","Uganda only"],c:2,hint:"The largest lake in Africa, shared by three countries."},
+    {q:"What is the capital of Iceland?",a:["Akureyri","Reykjavik","Hafnarfjörður","Keflavik"],c:1,hint:"The northernmost capital city in the world."},
+  ]
+};
+
+const T = {
+  nl: {
+    trivia:'Trivia challenge', title:'World Explorer Quiz',
+    subtitle:'Test je kennis over landen, hoofdsteden en geografie. Hoe snel ben jij?',
+    labelNick:'Jouw nickname', placeholder:'bijv. WanderingJuanita',
+    labelDiff:'Moeilijkheidsgraad', easy:'Makkelijk', medium:'Medium', hard:'Moeilijk',
+    startBtn:'Begin de quiz',
+    privacy:'Je nickname verschijnt op het gedeelde leaderboard. Er worden geen andere gegevens opgeslagen.',
+    question:'Vraag', done:'Klaar!',
+    score:'Score', correct:'Goed', streak:'Beste streak', avgTime:'Gem. tijd',
+    saving:'Score opslaan...', saved:'Score opgeslagen!',
+    saveFail:'Score kon niet worden opgeslagen: ',
+    loading:'Scores laden...', lbFail:'Leaderboard kon niet worden geladen.',
+    noScores:'Nog geen scores — jij bent de eerste!',
+    back:'Terug', again:'Opnieuw', backLink:'← blog',
+    correct_fb:(pts,hint)=>`Goed! +${pts} punten. ${hint}`,
+    wrong_fb:(ans,hint)=>`Helaas. Juist antwoord: ${ans}. ${hint}`,
+    result:(pct)=>pct>=80?'Indrukwekkend!':pct>=60?'Goed gespeeld!':'Blijf oefenen!',
+    resultSub:(pct)=>`${pct}% goed — jouw score wordt opgeslagen.`,
+  },
+  en: {
+    trivia:'Trivia challenge', title:'World Explorer Quiz',
+    subtitle:'Test your knowledge of countries, capitals and geography. How fast are you?',
+    labelNick:'Your nickname', placeholder:'e.g. WanderingJuanita',
+    labelDiff:'Difficulty', easy:'Easy', medium:'Medium', hard:'Hard',
+    startBtn:'Start the quiz',
+    privacy:'Your nickname will appear on the shared leaderboard. No other data is stored.',
+    question:'Question', done:'Done!',
+    score:'Score', correct:'Correct', streak:'Best streak', avgTime:'Avg. time',
+    saving:'Saving score...', saved:'Score saved!',
+    saveFail:'Score could not be saved: ',
+    loading:'Loading scores...', lbFail:'Leaderboard could not be loaded.',
+    noScores:'No scores yet — you are the first!',
+    back:'Back', again:'Play again', backLink:'← blog',
+    correct_fb:(pts,hint)=>`Correct! +${pts} points. ${hint}`,
+    wrong_fb:(ans,hint)=>`Wrong. Correct answer: ${ans}. ${hint}`,
+    result:(pct)=>pct>=80?'Impressive!':pct>=60?'Well done!':'Keep practising!',
+    resultSub:(pct)=>`${pct}% correct — your score is being saved.`,
+  }
+};
 
 const DIFF = { easy:{count:10,time:20}, medium:{count:15,time:15}, hard:{count:20,time:10} };
 const MEDALS = ['🥇','🥈','🥉'];
 
+let lang = 'nl';
 let nick = '', diff = 'medium', qList = [], currentQ = 0;
 let score = 0, correct = 0, streak = 0, maxStreak = 0, times = [];
 let timerInterval = null, timeLeft = 0;
 
-// Nick input
+function setLang(l) {
+  lang = l;
+  document.documentElement.lang = l;
+  document.getElementById('btn-nl').classList.toggle('active', l === 'nl');
+  document.getElementById('btn-en').classList.toggle('active', l === 'en');
+  applyTranslations();
+}
+
+function applyTranslations() {
+  const t = T[lang];
+  document.getElementById('label-trivia').textContent = t.trivia;
+  document.getElementById('title-main').textContent = t.title;
+  document.getElementById('subtitle-main').textContent = t.subtitle;
+  document.getElementById('label-nick').textContent = t.labelNick;
+  document.getElementById('nick-input').placeholder = t.placeholder;
+  document.getElementById('label-diff').textContent = t.labelDiff;
+  document.getElementById('diff-easy').textContent = t.easy;
+  document.getElementById('diff-medium').textContent = t.medium;
+  document.getElementById('diff-hard').textContent = t.hard;
+  document.getElementById('start-btn').textContent = t.startBtn;
+  document.getElementById('privacy-note').textContent = t.privacy;
+  document.getElementById('label-done').textContent = t.done;
+  document.getElementById('label-score').textContent = t.score;
+  document.getElementById('label-correct').textContent = t.correct;
+  document.getElementById('label-streak').textContent = t.streak;
+  document.getElementById('label-time').textContent = t.avgTime;
+  document.getElementById('btn-back').textContent = t.back;
+  document.getElementById('btn-again').textContent = t.again;
+  document.getElementById('back-link').textContent = t.backLink;
+}
+
+applyTranslations();
+
 const nickInput = document.getElementById('nick-input');
 const startBtn = document.getElementById('start-btn');
 nickInput.addEventListener('input', function() {
@@ -550,7 +692,6 @@ nickInput.addEventListener('input', function() {
   startBtn.disabled = nick.length < 2;
 });
 
-// Difficulty
 document.querySelectorAll('.diff-btn').forEach(b => {
   b.addEventListener('click', function() {
     document.querySelectorAll('.diff-btn').forEach(x => x.classList.remove('selected'));
@@ -566,33 +707,32 @@ function show(id) {
   document.getElementById(id).classList.add('active');
 }
 
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
 function startGame() {
   const s = DIFF[diff];
-  function shuffle(arr) {
-    const a = [...arr];
-    for (let i = a.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [a[i], a[j]] = [a[j], a[i]];
-    }
-    return a;
-  }
-  qList = shuffle(QUESTIONS).slice(0, s.count);
+  qList = shuffle(QUESTIONS[lang]).slice(0, s.count);
   currentQ = 0; score = 0; correct = 0; streak = 0; maxStreak = 0; times = [];
   show('screen-quiz');
   showQuestion();
 }
 
 function showQuestion() {
+  const t = T[lang];
   const s = DIFF[diff];
   const q = qList[currentQ];
-  const pct = (currentQ / qList.length) * 100;
-  document.getElementById('progress-fill').style.width = pct + '%';
-  document.getElementById('q-count').textContent = `Vraag ${currentQ + 1} / ${qList.length}`;
+  document.getElementById('progress-fill').style.width = ((currentQ / qList.length) * 100) + '%';
+  document.getElementById('q-count').textContent = `${t.question} ${currentQ + 1} / ${qList.length}`;
   document.getElementById('question-text').textContent = q.q;
   const fb = document.getElementById('feedback-box');
-  fb.textContent = '';
-  fb.className = 'feedback-box';
-
+  fb.textContent = ''; fb.className = 'feedback-box';
   const grid = document.getElementById('answers-grid');
   grid.innerHTML = '';
   q.a.forEach((ans, i) => {
@@ -602,7 +742,6 @@ function showQuestion() {
     btn.addEventListener('click', () => answer(i));
     grid.appendChild(btn);
   });
-
   timeLeft = s.time;
   updateTimer();
   clearInterval(timerInterval);
@@ -621,29 +760,28 @@ function updateTimer() {
 
 function answer(idx) {
   clearInterval(timerInterval);
+  const t = T[lang];
   const q = qList[currentQ];
   const s = DIFF[diff];
   times.push(s.time - timeLeft);
   const btns = document.getElementById('answers-grid').querySelectorAll('.ans-btn');
   btns.forEach(b => b.disabled = true);
   const fb = document.getElementById('feedback-box');
-
   if (idx === q.c) {
     btns[idx].classList.add('correct');
     correct++; streak++;
     if (streak > maxStreak) maxStreak = streak;
     const pts = Math.round(100 + (timeLeft / s.time) * 100);
     score += pts;
-    fb.textContent = `Goed! +${pts} punten. ${q.hint}`;
+    fb.textContent = t.correct_fb(pts, q.hint);
     fb.className = 'feedback-box correct';
   } else {
     if (idx >= 0) btns[idx].classList.add('wrong');
     btns[q.c].classList.add('correct');
     streak = 0;
-    fb.textContent = `Helaas. Juist antwoord: ${q.a[q.c]}. ${q.hint}`;
+    fb.textContent = t.wrong_fb(q.a[q.c], q.hint);
     fb.className = 'feedback-box wrong';
   }
-
   setTimeout(() => {
     currentQ++;
     if (currentQ < qList.length) showQuestion();
@@ -652,23 +790,20 @@ function answer(idx) {
 }
 
 async function endGame() {
+  const t = T[lang];
   const avgTime = times.length > 0 ? Math.round(times.reduce((a, b) => a + b, 0) / times.length) : 0;
   const pct = Math.round((correct / qList.length) * 100);
-
-  let heading = pct >= 80 ? 'Indrukwekkend!' : pct >= 60 ? 'Goed gespeeld!' : 'Blijf oefenen!';
-  document.getElementById('result-heading').textContent = heading;
-  document.getElementById('result-sub').textContent = `${pct}% goed — jouw score wordt opgeslagen.`;
+  document.getElementById('result-heading').textContent = t.result(pct);
+  document.getElementById('result-sub').textContent = t.resultSub(pct);
   document.getElementById('res-score').textContent = score;
   document.getElementById('res-correct').textContent = `${correct}/${qList.length}`;
   document.getElementById('res-streak').textContent = maxStreak;
   document.getElementById('res-time').textContent = avgTime + 's';
   document.getElementById('lb-diff-label').textContent = diff;
-  document.getElementById('score-saving').textContent = 'Score opslaan...';
+  document.getElementById('score-saving').textContent = t.saving;
   document.getElementById('error-msg').style.display = 'none';
-
+  document.getElementById('lb-body').innerHTML = `<div class="lb-loading">${t.loading}</div>`;
   show('screen-result');
-
-  // Save score
   try {
     const res = await fetch(API_BASE, {
       method: 'POST',
@@ -677,28 +812,27 @@ async function endGame() {
     });
     if (!res.ok) {
       const err = await res.json();
-      throw new Error((err.error || 'Opslaan mislukt') + (err.detail ? ': ' + err.detail : ''));
+      throw new Error((err.error || 'Failed') + (err.detail ? ': ' + err.detail : ''));
     }
-    document.getElementById('score-saving').textContent = 'Score opgeslagen!';
+    document.getElementById('score-saving').textContent = t.saved;
   } catch (e) {
     document.getElementById('score-saving').textContent = '';
     const errEl = document.getElementById('error-msg');
-    errEl.textContent = 'Score kon niet worden opgeslagen: ' + e.message + ' — ' + (e.detail || '');
+    errEl.textContent = t.saveFail + e.message;
     errEl.style.display = 'block';
   }
-
-  // Load leaderboard
   loadLeaderboard();
 }
 
 async function loadLeaderboard() {
+  const t = T[lang];
   const body = document.getElementById('lb-body');
   try {
     const res = await fetch(`${API_BASE}?difficulty=${diff}`);
-    if (!res.ok) throw new Error('Laden mislukt');
+    if (!res.ok) throw new Error();
     const data = await res.json();
     if (!data.length) {
-      body.innerHTML = '<div class="lb-loading">Nog geen scores — jij bent de eerste!</div>';
+      body.innerHTML = `<div class="lb-loading">${t.noScores}</div>`;
       return;
     }
     body.innerHTML = data.map((entry, i) => `
@@ -709,7 +843,7 @@ async function loadLeaderboard() {
       </div>
     `).join('');
   } catch (e) {
-    body.innerHTML = '<div class="lb-loading">Leaderboard kon niet worden geladen.</div>';
+    body.innerHTML = `<div class="lb-loading">${t.lbFail}</div>`;
   }
 }
 
