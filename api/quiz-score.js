@@ -7,7 +7,7 @@ const supabase = createClient(
 );
 
 const ALLOWED_ORIGINS = [
-  'https://juanitaexplores.github.io',
+  'https://juahtjeeh.github.io',
   'https://juanitaexplores.com'
 ];
 
@@ -26,7 +26,6 @@ export default async function handler(req, res) {
   if (req.method === 'POST') {
     const { nickname, score, difficulty, correct, total } = req.body;
 
-    // Validatie
     if (!nickname || !/^[a-zA-Z0-9]{2,20}$/.test(nickname))
       return res.status(400).json({ error: 'Ongeldige nickname' });
     if (!['easy','medium','hard'].includes(difficulty))
@@ -34,7 +33,6 @@ export default async function handler(req, res) {
     if (typeof score !== 'number' || score < 0 || score > 9999)
       return res.status(400).json({ error: 'Ongeldige score' });
 
-    // Rate limit check
     const { data: allowed } = await supabase
       .rpc('check_quiz_rate_limit', { p_ip_hash: ipHash, p_difficulty: difficulty });
     if (!allowed)
