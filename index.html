@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>World Explorer Quiz — juanitaexplores.com</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --sand: #F5EFE0;
+    --sand-dark: #E8DEC8;
+    --ink: #1C1917;
+    --ink-light: #57534E;
+    --teal: #0D6E5A;
+    --teal-light: #E0F2EE;
+    --teal-mid: #1D9E75;
+    --coral: #C1440E;
+    --coral-light: #FBE9E3;
+    --gold: #B5862A;
+    --gold-light: #FDF3DC;
+    --white: #FFFFFF;
+    --radius: 12px;
+    --radius-sm: 8px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--sand);
+    color: var(--ink);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 24px 16px 48px;
+  }
+
+  header {
+    width: 100%;
+    max-width: 560px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 32px;
+  }
+
+  .logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 15px;
+    color: var(--ink-light);
+    letter-spacing: 0.02em;
+  }
+
+  .logo span { color: var(--teal); }
+
+  .back-link {
+    font-size: 13px;
+    color: var(--ink-light);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    transition: color 0.15s;
+  }
+  .back-link:hover { color: var(--teal); }
+
+  .card {
+    background: var(--white);
+    border-radius: var(--radius);
+    padding: 32px;
+    width: 100%;
+    max-width: 560px;
+    border: 1px solid var(--sand-dark);
+  }
+
+  .screen { display: none; }
+  .screen.active { display: block; }
+
+  /* Nick screen */
+  .hero-label {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--teal);
+    margin-bottom: 8px;
+  }
+
+  h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 32px;
+    line-height: 1.2;
+    margin-bottom: 12px;
+    color: var(--ink);
+  }
+
+  .subtitle {
+    font-size: 15px;
+    color: var(--ink-light);
+    line-height: 1.6;
+    margin-bottom: 28px;
+  }
+
+  label {
+    display: block;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-light);
+    margin-bottom: 8px;
+  }
+
+  input[type="text"] {
+    width: 100%;
+    padding: 12px 16px;
+    font-size: 16px;
+    font-family: 'DM Sans', sans-serif;
+    border: 1.5px solid var(--sand-dark);
+    border-radius: var(--radius-sm);
+    background: var(--sand);
+    color: var(--ink);
+    outline: none;
+    transition: border-color 0.15s;
+    margin-bottom: 24px;
+  }
+  input[type="text"]:focus { border-color: var(--teal); background: var(--white); }
+
+  .diff-label {
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-light);
+    margin-bottom: 10px;
+  }
+
+  .diff-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-bottom: 28px;
+  }
+
+  .diff-btn {
+    background: var(--sand);
+    border: 1.5px solid var(--sand-dark);
+    border-radius: var(--radius-sm);
+    padding: 12px 8px;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.15s;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .diff-btn:hover { border-color: var(--teal-mid); background: var(--teal-light); }
+  .diff-btn.selected { border-color: var(--teal); background: var(--teal-light); }
+  .diff-btn .diff-name { font-size: 14px; font-weight: 500; color: var(--ink); }
+  .diff-btn.selected .diff-name { color: var(--teal); }
+  .diff-btn .diff-meta { font-size: 11px; color: var(--ink-light); margin-top: 3px; }
+
+  .btn-primary {
+    width: 100%;
+    padding: 14px;
+    background: var(--teal);
+    color: var(--white);
+    border: none;
+    border-radius: var(--radius-sm);
+    font-size: 15px;
+    font-weight: 500;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.1s;
+    letter-spacing: 0.02em;
+  }
+  .btn-primary:hover { background: #0A5A49; }
+  .btn-primary:active { transform: scale(0.99); }
+  .btn-primary:disabled { background: var(--sand-dark); color: var(--ink-light); cursor: default; }
+
+  .privacy-note {
+    font-size: 11px;
+    color: var(--ink-light);
+    text-align: center;
+    margin-top: 16px;
+    line-height: 1.5;
+  }
+
+  /* Quiz screen */
+  .progress-wrap {
+    height: 3px;
+    background: var(--sand);
+    border-radius: 2px;
+    margin-bottom: 24px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--teal-mid);
+    border-radius: 2px;
+    transition: width 0.4s ease;
+  }
+
+  .quiz-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+
+  .q-count {
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-light);
+  }
+
+  .timer-pill {
+    font-size: 13px;
+    font-weight: 500;
+    padding: 4px 12px;
+    border-radius: 20px;
+    background: var(--sand);
+    color: var(--ink);
+    transition: background 0.3s, color 0.3s;
+    min-width: 52px;
+    text-align: center;
+  }
+  .timer-pill.urgent { background: var(--coral-light); color: var(--coral); }
+
+  .question-text {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    line-height: 1.4;
+    color: var(--ink);
+    margin-bottom: 24px;
+  }
+
+  .answers-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+
+  .ans-btn {
+    background: var(--sand);
+    border: 1.5px solid var(--sand-dark);
+    border-radius: var(--radius-sm);
+    padding: 14px 12px;
+    font-size: 14px;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    color: var(--ink);
+    text-align: center;
+    transition: all 0.15s;
+    line-height: 1.4;
+  }
+  .ans-btn:hover:not(:disabled) { border-color: var(--teal-mid); background: var(--teal-light); }
+  .ans-btn.correct { background: var(--teal-light); border-color: var(--teal); color: var(--teal); font-weight: 500; }
+  .ans-btn.wrong { background: var(--coral-light); border-color: var(--coral); color: var(--coral); }
+  .ans-btn:disabled { cursor: default; }
+
+  .feedback-box {
+    min-height: 44px;
+    padding: 10px 14px;
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+    line-height: 1.5;
+    transition: all 0.2s;
+  }
+  .feedback-box.correct { background: var(--teal-light); color: var(--teal); }
+  .feedback-box.wrong { background: var(--coral-light); color: var(--coral); }
+
+  /* Result screen */
+  .result-heading {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    margin-bottom: 6px;
+  }
+
+  .result-sub {
+    font-size: 14px;
+    color: var(--ink-light);
+    margin-bottom: 24px;
+  }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 24px;
+  }
+
+  .stat-card {
+    background: var(--sand);
+    border-radius: var(--radius-sm);
+    padding: 14px 16px;
+  }
+
+  .stat-label {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-light);
+    margin-bottom: 4px;
+  }
+
+  .stat-value {
+    font-size: 24px;
+    font-weight: 500;
+    color: var(--ink);
+  }
+
+  .lb-section {
+    border: 1px solid var(--sand-dark);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    margin-bottom: 24px;
+  }
+
+  .lb-header {
+    padding: 10px 16px;
+    background: var(--sand);
+    border-bottom: 1px solid var(--sand-dark);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-light);
+  }
+
+  .lb-row {
+    display: flex;
+    align-items: center;
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--sand-dark);
+    font-size: 14px;
+    gap: 12px;
+  }
+  .lb-row:last-child { border-bottom: none; }
+  .lb-row.mine { background: var(--teal-light); }
+
+  .lb-rank { width: 20px; color: var(--ink-light); font-size: 12px; }
+  .lb-name { flex: 1; color: var(--ink); }
+  .lb-score { font-weight: 500; color: var(--ink); }
+  .lb-medal { font-size: 14px; }
+
+  .lb-loading {
+    padding: 20px 16px;
+    text-align: center;
+    font-size: 13px;
+    color: var(--ink-light);
+  }
+
+  .action-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .btn-secondary {
+    padding: 12px;
+    background: var(--white);
+    color: var(--ink);
+    border: 1.5px solid var(--sand-dark);
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    font-weight: 500;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .btn-secondary:hover { border-color: var(--ink-light); }
+
+  .score-saving {
+    text-align: center;
+    font-size: 12px;
+    color: var(--ink-light);
+    margin-bottom: 12px;
+  }
+
+  .error-msg {
+    background: var(--coral-light);
+    color: var(--coral);
+    border-radius: var(--radius-sm);
+    padding: 10px 14px;
+    font-size: 13px;
+    margin-bottom: 16px;
+    display: none;
+  }
+
+  @media (max-width: 480px) {
+    .card { padding: 24px 20px; }
+    h1 { font-size: 26px; }
+    .question-text { font-size: 19px; }
+    .answers-grid { grid-template-columns: 1fr; }
+    .stats-grid { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">juanita<span>explores</span>.com</div>
+  <a class="back-link" href="https://juanitaexplores.com">← terug naar blog</a>
+</header>
+
+<div class="card">
+
+  <!-- SCHERM 1: NICKNAME -->
+  <div id="screen-nick" class="screen active">
+    <div class="hero-label">Trivia challenge</div>
+    <h1>World Explorer Quiz</h1>
+    <p class="subtitle">Test je kennis over landen, hoofdsteden en geografie. Hoe snel ben jij?</p>
+
+    <label for="nick-input">Jouw nickname</label>
+    <input type="text" id="nick-input" placeholder="bijv. WanderingJuanita" maxlength="20" autocomplete="off" />
+
+    <div class="diff-label">Moeilijkheidsgraad</div>
+    <div class="diff-grid">
+      <button class="diff-btn" data-diff="easy">
+        <div class="diff-name">Makkelijk</div>
+        <div class="diff-meta">10 vr · 20 sec</div>
+      </button>
+      <button class="diff-btn selected" data-diff="medium">
+        <div class="diff-name">Medium</div>
+        <div class="diff-meta">15 vr · 15 sec</div>
+      </button>
+      <button class="diff-btn" data-diff="hard">
+        <div class="diff-name">Moeilijk</div>
+        <div class="diff-meta">20 vr · 10 sec</div>
+      </button>
+    </div>
+
+    <button class="btn-primary" id="start-btn" disabled>Begin de quiz</button>
+    <p class="privacy-note">Je nickname verschijnt op het gedeelde leaderboard. Er worden geen andere gegevens opgeslagen.</p>
+  </div>
+
+  <!-- SCHERM 2: QUIZ -->
+  <div id="screen-quiz" class="screen">
+    <div class="progress-wrap"><div class="progress-fill" id="progress-fill"></div></div>
+    <div class="quiz-meta">
+      <span class="q-count" id="q-count">Vraag 1 / 15</span>
+      <span class="timer-pill" id="timer">15s</span>
+    </div>
+    <div class="question-text" id="question-text"></div>
+    <div class="answers-grid" id="answers-grid"></div>
+    <div class="feedback-box" id="feedback-box"></div>
+  </div>
+
+  <!-- SCHERM 3: RESULTAAT -->
+  <div id="screen-result" class="screen">
+    <div class="hero-label">Klaar!</div>
+    <div class="result-heading" id="result-heading">Goed gespeeld</div>
+    <div class="result-sub" id="result-sub">Jouw score is opgeslagen.</div>
+
+    <div class="stats-grid">
+      <div class="stat-card"><div class="stat-label">Score</div><div class="stat-value" id="res-score">0</div></div>
+      <div class="stat-card"><div class="stat-label">Goed</div><div class="stat-value" id="res-correct">0/0</div></div>
+      <div class="stat-card"><div class="stat-label">Beste streak</div><div class="stat-value" id="res-streak">0</div></div>
+      <div class="stat-card"><div class="stat-label">Gem. tijd</div><div class="stat-value" id="res-time">0s</div></div>
+    </div>
+
+    <div class="lb-section">
+      <div class="lb-header">Leaderboard — <span id="lb-diff-label">medium</span></div>
+      <div id="lb-body"><div class="lb-loading">Scores laden...</div></div>
+    </div>
+
+    <div class="score-saving" id="score-saving"></div>
+    <div class="error-msg" id="error-msg"></div>
+
+    <div class="action-row">
+      <button class="btn-secondary" onclick="goToNick()">Terug</button>
+      <button class="btn-primary" onclick="restart()">Opnieuw</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const API_BASE = 'https://quiz-eight-khaki-53.vercel.app/api/quiz-score';
+
+const QUESTIONS = [
+  {q:"Wat is de hoofdstad van Japan?",a:["Tokyo","Osaka","Kyoto","Hiroshima"],c:0,hint:"De grootste metropool ter wereld."},
+  {q:"In welk land ligt Machu Picchu?",a:["Colombia","Bolivia","Peru","Ecuador"],c:2,hint:"In de Andes, op 2.430 meter hoogte."},
+  {q:"Welke rivier stroomt door Egypte?",a:["Congo","Niger","Zambezi","Nijl"],c:3,hint:"De langste rivier ter wereld."},
+  {q:"Hoeveel landen telt het Afrikaanse continent?",a:["44","54","62","48"],c:1,hint:"Meer dan je denkt!"},
+  {q:"Wat is de kleinste staat ter wereld?",a:["Monaco","Liechtenstein","Vaticaanstad","San Marino"],c:2,hint:"Ligt volledig binnen Rome."},
+  {q:"Welk land heeft de meeste tijdzones?",a:["Rusland","USA","China","Canada"],c:0,hint:"Strekt zich uit over 11 zones."},
+  {q:"In welk land ligt de meeste Sahara?",a:["Libië","Sudan","Algerije","Mauritanië"],c:2,hint:"Het grootste land van Afrika."},
+  {q:"Wat is de hoogste berg van Afrika?",a:["Mount Kenya","Kilimanjaro","Rwenzori","Atlas"],c:1,hint:"Staat in Tanzania."},
+  {q:"Welk land heeft de langste kustlijn?",a:["Noorwegen","Rusland","Canada","Australië"],c:2,hint:"Noord-Amerika's grote buurland."},
+  {q:"In welk werelddeel ligt Georgië?",a:["Europa","Azië","Beide","Midden-Oosten"],c:2,hint:"Ligt precies op de grens van twee continenten."},
+  {q:"Wat is de hoofdstad van Australië?",a:["Sydney","Melbourne","Brisbane","Canberra"],c:3,hint:"Niet de grootste stad van het land."},
+  {q:"Welk land heeft de meeste inwoners?",a:["India","China","USA","Indonesië"],c:0,hint:"Heeft China recent ingehaald."},
+  {q:"Hoeveel landen grenzen aan Zwitserland?",a:["4","5","6","7"],c:1,hint:"Denk aan alle windrichtingen."},
+  {q:"Welk land ligt volledig in de Pyreneeën?",a:["Monaco","Andorra","San Marino","Liechtenstein"],c:1,hint:"Tussen Spanje en Frankrijk."},
+  {q:"Welke oceaan is het diepst?",a:["Atlantische","Indische","Arctische","Stille"],c:3,hint:"De Marianentrog ligt hier."},
+  {q:"In welk land ligt Petra?",a:["Egypte","Irak","Jordanië","Syrië"],c:2,hint:"Een roze rotsstad in het Midden-Oosten."},
+  {q:"Welk eiland is het grootste ter wereld?",a:["Borneo","Madagaskar","Groenland","Nieuw-Guinea"],c:2,hint:"Autonoom Deens gebied."},
+  {q:"In welk land staat de Eiffeltoren?",a:["België","Zwitserland","Frankrijk","Luxemburg"],c:2,hint:"Een makkelijke bonus!"},
+  {q:"Wat is de langste rivier van Zuid-Amerika?",a:["Orinoco","Rio de la Plata","Amazonas","Paraná"],c:2,hint:"Geeft naam aan het regenwoud."},
+  {q:"Welk land hoort NIET bij Scandinavië?",a:["Noorwegen","Finland","Denemarken","IJsland"],c:3,hint:"Ligt iets westelijker in de Atlantische Oceaan."},
+  {q:"Welke stad is de hoofdstad van Canada?",a:["Toronto","Vancouver","Montreal","Ottawa"],c:3,hint:"Niet de grootste stad."},
+  {q:"In welk land ligt de Angkor Wat?",a:["Thailand","Vietnam","Cambodja","Myanmar"],c:2,hint:"Een van de grootste religieuze complexen ter wereld."},
+  {q:"Welke zee ligt tussen Europa en Afrika?",a:["Rode Zee","Kaspische Zee","Middellandse Zee","Zwarte Zee"],c:2,hint:"Populaire vakantiebestemming."},
+  {q:"Hoeveel sterren heeft de vlag van de EU?",a:["12","15","24","27"],c:0,hint:"Altijd hetzelfde aantal, ongeacht het aantal lidstaten."},
+  {q:"Welk land heeft de grootste oppervlakte?",a:["Canada","China","USA","Rusland"],c:3,hint:"Strekt zich uit over twee continenten."},
+];
+
+const DIFF = { easy:{count:10,time:20}, medium:{count:15,time:15}, hard:{count:20,time:10} };
+const MEDALS = ['🥇','🥈','🥉'];
+
+let nick = '', diff = 'medium', qList = [], currentQ = 0;
+let score = 0, correct = 0, streak = 0, maxStreak = 0, times = [];
+let timerInterval = null, timeLeft = 0;
+
+// Nick input
+const nickInput = document.getElementById('nick-input');
+const startBtn = document.getElementById('start-btn');
+nickInput.addEventListener('input', function() {
+  this.value = this.value.replace(/[^a-zA-Z0-9]/g, '');
+  nick = this.value;
+  startBtn.disabled = nick.length < 2;
+});
+
+// Difficulty
+document.querySelectorAll('.diff-btn').forEach(b => {
+  b.addEventListener('click', function() {
+    document.querySelectorAll('.diff-btn').forEach(x => x.classList.remove('selected'));
+    this.classList.add('selected');
+    diff = this.dataset.diff;
+  });
+});
+
+startBtn.addEventListener('click', startGame);
+
+function show(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function startGame() {
+  const s = DIFF[diff];
+  qList = [...QUESTIONS].sort(() => Math.random() - 0.5).slice(0, s.count);
+  currentQ = 0; score = 0; correct = 0; streak = 0; maxStreak = 0; times = [];
+  show('screen-quiz');
+  showQuestion();
+}
+
+function showQuestion() {
+  const s = DIFF[diff];
+  const q = qList[currentQ];
+  const pct = (currentQ / qList.length) * 100;
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('q-count').textContent = `Vraag ${currentQ + 1} / ${qList.length}`;
+  document.getElementById('question-text').textContent = q.q;
+  const fb = document.getElementById('feedback-box');
+  fb.textContent = '';
+  fb.className = 'feedback-box';
+
+  const grid = document.getElementById('answers-grid');
+  grid.innerHTML = '';
+  q.a.forEach((ans, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'ans-btn';
+    btn.textContent = ans;
+    btn.addEventListener('click', () => answer(i));
+    grid.appendChild(btn);
+  });
+
+  timeLeft = s.time;
+  updateTimer();
+  clearInterval(timerInterval);
+  timerInterval = setInterval(() => {
+    timeLeft--;
+    updateTimer();
+    if (timeLeft <= 0) { clearInterval(timerInterval); answer(-1); }
+  }, 1000);
+}
+
+function updateTimer() {
+  const el = document.getElementById('timer');
+  el.textContent = timeLeft + 's';
+  el.className = 'timer-pill' + (timeLeft <= 5 ? ' urgent' : '');
+}
+
+function answer(idx) {
+  clearInterval(timerInterval);
+  const q = qList[currentQ];
+  const s = DIFF[diff];
+  times.push(s.time - timeLeft);
+  const btns = document.getElementById('answers-grid').querySelectorAll('.ans-btn');
+  btns.forEach(b => b.disabled = true);
+  const fb = document.getElementById('feedback-box');
+
+  if (idx === q.c) {
+    btns[idx].classList.add('correct');
+    correct++; streak++;
+    if (streak > maxStreak) maxStreak = streak;
+    const pts = Math.round(100 + (timeLeft / s.time) * 100);
+    score += pts;
+    fb.textContent = `Goed! +${pts} punten. ${q.hint}`;
+    fb.className = 'feedback-box correct';
+  } else {
+    if (idx >= 0) btns[idx].classList.add('wrong');
+    btns[q.c].classList.add('correct');
+    streak = 0;
+    fb.textContent = `Helaas. Juist antwoord: ${q.a[q.c]}. ${q.hint}`;
+    fb.className = 'feedback-box wrong';
+  }
+
+  setTimeout(() => {
+    currentQ++;
+    if (currentQ < qList.length) showQuestion();
+    else endGame();
+  }, 2000);
+}
+
+async function endGame() {
+  const avgTime = times.length > 0 ? Math.round(times.reduce((a, b) => a + b, 0) / times.length) : 0;
+  const pct = Math.round((correct / qList.length) * 100);
+
+  let heading = pct >= 80 ? 'Indrukwekkend!' : pct >= 60 ? 'Goed gespeeld!' : 'Blijf oefenen!';
+  document.getElementById('result-heading').textContent = heading;
+  document.getElementById('result-sub').textContent = `${pct}% goed — jouw score wordt opgeslagen.`;
+  document.getElementById('res-score').textContent = score;
+  document.getElementById('res-correct').textContent = `${correct}/${qList.length}`;
+  document.getElementById('res-streak').textContent = maxStreak;
+  document.getElementById('res-time').textContent = avgTime + 's';
+  document.getElementById('lb-diff-label').textContent = diff;
+  document.getElementById('score-saving').textContent = 'Score opslaan...';
+  document.getElementById('error-msg').style.display = 'none';
+
+  show('screen-result');
+
+  // Save score
+  try {
+    const res = await fetch(API_BASE, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ nickname: nick, score, difficulty: diff, correct, total: qList.length })
+    });
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.error || 'Opslaan mislukt');
+    }
+    document.getElementById('score-saving').textContent = 'Score opgeslagen!';
+  } catch (e) {
+    document.getElementById('score-saving').textContent = '';
+    const errEl = document.getElementById('error-msg');
+    errEl.textContent = 'Score kon niet worden opgeslagen: ' + e.message;
+    errEl.style.display = 'block';
+  }
+
+  // Load leaderboard
+  loadLeaderboard();
+}
+
+async function loadLeaderboard() {
+  const body = document.getElementById('lb-body');
+  try {
+    const res = await fetch(`${API_BASE}?difficulty=${diff}`);
+    if (!res.ok) throw new Error('Laden mislukt');
+    const data = await res.json();
+    if (!data.length) {
+      body.innerHTML = '<div class="lb-loading">Nog geen scores — jij bent de eerste!</div>';
+      return;
+    }
+    body.innerHTML = data.map((entry, i) => `
+      <div class="lb-row${entry.nickname === nick && entry.score === score ? ' mine' : ''}">
+        <span class="lb-rank">${MEDALS[i] || (i + 1)}</span>
+        <span class="lb-name">${entry.nickname}</span>
+        <span class="lb-score">${entry.score}</span>
+      </div>
+    `).join('');
+  } catch (e) {
+    body.innerHTML = '<div class="lb-loading">Leaderboard kon niet worden geladen.</div>';
+  }
+}
+
+function goToNick() { show('screen-nick'); }
+function restart() { startGame(); }
+</script>
+</body>
+</html>
